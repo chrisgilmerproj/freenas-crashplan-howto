@@ -50,6 +50,7 @@ Edit /etc/rc.conf
 ```
 ...
 sshd_enable="YES"
+crashplan_enable="YES"
 ...
 ```
 Create User for ssh-access
