@@ -1,9 +1,14 @@
 # How-to : Crashplan & Freenas
 
-Pre-requisites
+## Pre-requisites
 
 * [Crashplan account (free)](http://www.crashplan.com/)
 * FreeNAS-9.2.1-RELEASE-x64
+
+
+## References
+
+- [Using CrashPlan On A Headless Computer](http://support.code42.com/CrashPlan/4/Configuring/Using_CrashPlan_On_A_Headless_Computer)
 
 ## Install
 
