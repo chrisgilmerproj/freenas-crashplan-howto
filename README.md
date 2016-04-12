@@ -41,16 +41,22 @@ b) Open terminal to _jail_ from WebUI
 
 Install bash [(it is required during the crashplan automatic updates)](https://bugs.freenas.org/issues/12375)
 ```
-pkg refresh
-pkg install bash
+root@crashplan_1:/ # pkg install bash
 
 # crashplan is expecting bash to be in /bin
-ln -s /usr/local/bin/bash /bin/bash
+root@crashplan_1:/ # ln -s /usr/local/bin/bash /bin/bash
 ```
 
 Enable sshd and crashplan. The instructions below are taken from [the FreeNAS wiki](http://doc.freenas.org/index.php/Adding_Jails#Accessing_the_Command_Line_of_a_Jail)
 
 Edit /etc/rc.conf
+
+```
+root@crashplan_1:/ # vi /etc/rc.conf
+```
+
+Ensure these settings exist and have the correct values:
+
 ```
 ...
 sshd_enable="YES"
@@ -124,16 +130,15 @@ I prefer to use a script that I can run.  Add a file called `/usr/local/bin/cras
 
 SERVICE_PORT=`cat /Library/Application\ Support/CrashPlan/ui_$USER.properties | grep servicePort | egrep -v '#' | awk -F "=" '{print $2}'`
 
-CRASHPLAN_USER="crashplan"     
-CRASHPLAN_JAIL=192.168.1.6     
-# Default port is 4243 usually 
-# CRASHPLAN_PORT=4243          
+CRASHPLAN_USER="crashplan"
+CRASHPLAN_JAIL=192.168.1.6
+# Default port is 4243 usually
 CRASHPLAN_PORT=4253
 
 echo "Connecting on Service Port: $SERVICE_PORT"
 echo "Expecting Crashplan FreeNAS Jail at: $CRASHPLAN_USER@$CRASHPLAN_JAIL"
 
-# Check configuration          
+# Check configuration
 echo
 echo "Check that the ports and keys match."
 echo
@@ -206,7 +211,9 @@ Windows: C:\Program Files\CrashPlan\conf\ui.properties
 Change the service port to 4200, which we will use to tunnel to the remote connection.
 
 ```
+...
 servicePort=4200
+...
 ```
 
 ### Step 8: Connect with Crashplan UI and update.
@@ -215,7 +222,13 @@ Launch the modified Crashplan UI on the desktop (my laptop). Ssh-tunnel must be 
 
 You can see how the version numbers increase with
 ```
-tail -f /usr/pbi/crashplan-amd64/share/crashplan/log/app.log | grep CPVERSION
+root@crashplan_1:/ # tail -f /usr/pbi/crashplan-amd64/share/crashplan/log/app.log | grep CPVERSION
+```
+
+You can also see what version exists by greping the log:
+
+```
+root@crashplan_1:/ # tail -f /var/log/crashplan/engine_output.log | grep CPVERSION
 ```
 
 Once the update is complete, make sure the client (desktop application) is the same version as the plugin, because even though they are supposed to auto update to the latest version, if there is a difference it will not work. 
@@ -226,7 +239,7 @@ Follow the instruction in this [*Step 1*](http://support.code42.com/CrashPlan/4/
 
 You can find the plugin token here
 ```
-cat /var/lib/crashplan/.ui_info
+root@crashplan_1:/ # cat /var/lib/crashplan/.ui_info
 ```
 
 ### Step 10: Connect with Crashplan UI...Finally!
@@ -246,6 +259,7 @@ You need to manually update a file.  First make a backup:
 ```sh
 root@crashplan_1:/ # cd /usr/pbi/crashplan-amd64/share/crashplan/bin
 root@crashplan_1:/usr/pbi/crashplan-amd64/share/crashplan/bin # cp -v run.conf run.conf.bkp
+root@crashplan_1:/usr/pbi/crashplan-amd64/share/crashplan/bin # cp -v run.conf run.conf.update
 ```
 
 The original file for `/usr/pbi/crashplan-amd64/share/crashplan/bin/run.conf` looks like this:
@@ -262,7 +276,18 @@ SRV_JAVA_OPTS="-Djava.nio.channels.spi.SelectorProvider=sun.nio.ch.PollSelectorP
 GUI_JAVA_OPTS="-Djava.nio.channels.spi.SelectorProvider=sun.nio.ch.PollSelectorProvider -Dfile.encoding=UTF-8 -Dapp=CrashPlanDesktop -DappBaseName=CrashPlan -Xms20m -Xmx512m -Djava.net.preferIPv4Stack=true -Dsun.net.inetaddr.ttl=300 -Dnetworkaddress.cache.ttl=300 -Dsun.net.inetaddr.negative.ttl=0 -Dnetworkaddress.cache.negative.ttl=0 -Dc42.native.md5.enabled=false"
 ```
 
+Simply copy the updated version.  It sometimes is overwritten so having it on hand makes things nice and easy:
+
+```sh
+root@crashplan_1:/usr/pbi/crashplan-amd64/share/crashplan/bin # cp -v run.conf.update run.conf
+```
+
 Finally, you need to stop and start the jail.  Without doing this the plugin will not start correctly.
+
+```sh
+root@crashplan_1:/usr/pbi/crashplan-amd64/share/crashplan/bin # service crashplan restart
+```
+
 
 ### Cannot connect to crashplan jail over ssh
 
@@ -275,6 +300,8 @@ Sometimes the `sshd` service needs to be restarted.  This is easy:
 [root@freenas] ~# jexec 1 /bin/tcsh
 root@crashplan_1:/ # service sshd restart
 ```
+
+You may also have an issue where you changed the IP of the Jail.  If you did that you must restart the jail for changes to take affect.
 
 ## I ran into a problem during setup. How do I document and share my experience?
 
