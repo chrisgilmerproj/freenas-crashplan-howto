@@ -114,18 +114,35 @@ I prefer to use a script that I can run.  Add a file called `/usr/local/bin/cras
 
 ```sh
 #!/bin/bash
-
+                               
 # Port forward to FreeNAS for Crashplan plugin
 
-SERVICE_PORT=`cat /Applications/CrashPlan.app/Contents/Resources/Java/conf/ui.properties | grep servicePort | egrep -v '#' | awk -F "=" '{print $2}'`
+SERVICE_PORT=`cat /Library/Application\ Support/CrashPlan/ui_$USER.properties | grep servicePort | egrep -v '#' | awk -F "=" '{print $2}'`
 
-CRASHPLAN_USER="crashplan"
-CRASHPLAN_JAIL=192.168.1.2
+CRASHPLAN_USER="crashplan"     
+CRASHPLAN_JAIL=192.168.1.6     
+# Default port is 4243 usually 
+# CRASHPLAN_PORT=4243          
+CRASHPLAN_PORT=4253
+
 echo "Connecting on Service Port: $SERVICE_PORT"
 echo "Expecting Crashplan FreeNAS Jail at: $CRASHPLAN_USER@$CRASHPLAN_JAIL"
 
+# Check configuration          
+echo
+echo "Check that the ports and keys match."
+echo
+echo "Remote Computer: (Expect port $CRASHPLAN_PORT)"
+ssh $CRASHPLAN_USER@$CRASHPLAN_JAIL "cat /var/lib/crashplan/.ui_info"
+echo
+echo "Local Computer: (Expect port $SERVICE_PORT)"
+cat /Library/Application\ Support/CrashPlan/.ui_info
+
 # Connect to crashplan
-ssh -L $SERVICE_PORT:127.0.0.1:4243 $CRASHPLAN_USER@$CRASHPLAN_JAIL -N
+echo
+echo "Forward the port"
+echo "ssh -L $SERVICE_PORT:127.0.0.1:$CRASHPLAN_PORT $CRASHPLAN_USER@$CRASHPLAN_JAIL -N"
+ssh -L $SERVICE_PORT:127.0.0.1:$CRASHPLAN_PORT $CRASHPLAN_USER@$CRASHPLAN_JAIL -N
 ```
 
 
