@@ -41,6 +41,7 @@ b) Open terminal to _jail_ from WebUI
 
 Install bash [(it is required during the crashplan automatic updates)](https://bugs.freenas.org/issues/12375)
 ```
+root@crashplan_1:/ # pkg update
 root@crashplan_1:/ # pkg install bash
 
 # crashplan is expecting bash to be in /bin
