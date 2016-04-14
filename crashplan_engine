@@ -1,0 +1,3 @@
+#!/bin/bash
+
+cpuset -l 0 /usr/local/share/crashplan/bin/CrashPlanEngine $1

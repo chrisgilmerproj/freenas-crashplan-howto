@@ -1,0 +1,4 @@
+#! /bin/bash
+
+cat /usr/pbi/crashplan-amd64/share/crashplan/log/app.log | grep CPVERSION | cut -d"=" -f 2
+cat /var/log/crashplan/engine_output.log | grep CPVERSION | cut -d ']' -f 2 | cut -d"=" -f 2
